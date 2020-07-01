@@ -69,14 +69,14 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
         HttpHeaders headers;
         Jackson2JsonParser parser2;
 
-        Author author = Author.builder()
+        Author newauthor = Author.builder()
                 .id("PO_TD_VAL")
                 .name("PO")
                 .password("abc1234")
                 .roles(Set.of(AuthorRole.USER))
                 .build();
 
-        Author afterSaveAuthor = this.saveAuthor(author);
+        Author afterSaveAuthor = this.saveAuthor(newauthor);
 
         headers = new HttpHeaders();
         headers.setBasicAuth(appProperties.getClientId(),appProperties.getClientSecret());
@@ -84,7 +84,7 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
 
         MultiValueMap<String,String> parameters = new LinkedMultiValueMap<>();
         parameters.add("grant_type","password");
-        parameters.add("username","PO_TD_VALUE");
+        parameters.add("username",newauthor.getId());
         parameters.add("password","abc1234");
         HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(parameters,headers);
 
