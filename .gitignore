@@ -1,0 +1,14 @@
+src/main/resources/application.properties
+src/main/resources/application-deploy.properties
+src/test/resources/application-test.properties
+HELP.md
+
+target/**
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
