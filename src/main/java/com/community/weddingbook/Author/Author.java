@@ -17,13 +17,13 @@ import java.util.Set;
 @Entity(name = "Author")
 public class Author {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     String id;
 
-    @NotNull @Size(max = 12)
+    @NotNull
     String name;
 
-    @NotNull @Size(max = 12)
+    @NotNull
     String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
