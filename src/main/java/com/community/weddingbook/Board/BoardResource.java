@@ -1,39 +1,18 @@
-//package com.community.weddingbook.Board;
-//import org.springframework.hateoas.EntityModel;
-//import org.springframework.hateoas.Link;
-//import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-//
-//import java.net.URI;
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-//
-//public class BoardResource extends EntityModel<Board> {
-//
-//    private static WebMvcLinkBuilder selfLinkBuilder = linkTo(BoardController.class);
-//
-//    private BoardResource(){ }
-//
-//    public static EntityModel<Board> of(Board board, String profile){
-//        List<Link> links = getSelfLink(board);
-//        links.add(Link.of(profile, "profile"));
-//        return EntityModel.of(board, links);
-//    }
-//
-//    public static EntityModel<Board> of(Board board){
-//        List<Link> links = getSelfLink(board);
-//        return EntityModel.of(board, links);
-//    }
-//
-//    private static List<Link> getSelfLink(Board board) {
-//        selfLinkBuilder.slash(board.getId());
-//        List<Link> links = new ArrayList<>();
-//        links.add(selfLinkBuilder.withSelfRel());
-//        return links;
-//    }
-//
-//    public static URI getCreatedUri(Board board) {
-//        return selfLinkBuilder.slash(board.getId()).toUri();
-//    }
-//}
+package com.community.weddingbook.Board;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
+public class BoardResource extends Resource<Board> {
+    public BoardResource(Board content, Link... links) {
+        super(content, links);
+        /* Self-Descriptive message(Docs-Link), HATEOAS */
+        add(linkTo(BoardController.class).slash("").withRel("[POST]게시물 추가"));
+        add(linkTo(BoardController.class).slash("list").withRel("[GET]게시물 전체 조회"));
+        add(linkTo(BoardController.class).slash("").withRel("[GET]게시물 상세 조회"));
+        add(linkTo(BoardController.class).slash("").withRel("[PUT]게시물 수정"));
+        add(linkTo(BoardController.class).slash("").withRel("[DELETE]게시물 삭제"));
+
+    }
+}

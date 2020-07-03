@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,6 +64,7 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
         return this.authorRepository.save(author);
     }
 
+    @Transactional
     @Override
     public ResponseEntity getTestID() {
 
@@ -69,28 +72,32 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
         HttpHeaders headers;
         Jackson2JsonParser parser2;
 
-        Author newauthor = Author.builder()
+        Author authorBuild = Author.builder()
                 .id("PO_TD_VAL")
                 .name("PO")
                 .password("abc1234")
                 .roles(Set.of(AuthorRole.USER))
                 .build();
 
-        Author afterSaveAuthor = this.saveAuthor(newauthor);
+        Optional<Author> getAuthorOptional = this.authorRepository.findById(authorBuild.getId());
+        if(!getAuthorOptional.isEmpty()) {
+            throw new IllegalArgumentException("이미 테스트 계정이 생성되었습니다.");
+        }
 
+        Author saveAuthorResult = this.saveAuthor(authorBuild);
         headers = new HttpHeaders();
         headers.setBasicAuth(appProperties.getClientId(),appProperties.getClientSecret());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String,String> parameters = new LinkedMultiValueMap<>();
         parameters.add("grant_type","password");
-        parameters.add("username",newauthor.getId());
+        parameters.add("username",saveAuthorResult.getId());
         parameters.add("password","abc1234");
         HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(parameters,headers);
 
         parser2 = new Jackson2JsonParser();
-
         restTemplate = new RestTemplate();
+
         String response = restTemplate.postForObject(appProperties.getGetOauthURL(),requestEntity,String.class);
         restTemplate.setInterceptors(Arrays.asList(new RestTemplateLoggingRequestInterceptor()));
 
@@ -100,17 +107,17 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
 
         /* Token 제대로 읽었는지 확인 */
         if(getaccess_Token == null || getrefrsh_Token == null ) {
-            authorRepository.delete(afterSaveAuthor);
+            authorRepository.delete(saveAuthorResult);
             return ResponseEntity.notFound().build();
         }
-        afterSaveAuthor.setServiceAccessToken(getaccess_Token);
-        afterSaveAuthor.setServiceRefreshToken(getrefrsh_Token);
+        saveAuthorResult.setServiceAccessToken(getaccess_Token);
+        saveAuthorResult.setServiceRefreshToken(getrefrsh_Token);
 
 
         /* 마지막으로 최종 저장  */
-        this.authorRepository.save(afterSaveAuthor);
+        this.authorRepository.save(saveAuthorResult);
 
 
-        return ResponseEntity.ok(afterSaveAuthor);
+        return ResponseEntity.ok(saveAuthorResult);
     }
 }
