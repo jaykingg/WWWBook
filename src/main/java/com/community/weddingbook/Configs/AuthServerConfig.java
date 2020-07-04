@@ -37,9 +37,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.passwordEncoder(passwordEncoder)
-                .tokenKeyAccess("permitAll()")
-                .checkTokenAccess("permitAll()");
+        security.passwordEncoder(passwordEncoder);
 
     }
 
@@ -47,7 +45,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
                 .withClient(appProperties.getClientId())
-                .authorizedGrantTypes("password","refresh_token")
+                .authorizedGrantTypes("password")
                 .scopes("read","write")
                 .secret(this.passwordEncoder.encode(appProperties.getClientSecret()))
                 /* TEST 를 위해 유효기간을 여유롭게 잡음. */
@@ -60,18 +58,6 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         endpoints.authenticationManager(authenticationManager)
                 .userDetailsService(authorServiceImpl)
                 .tokenStore(tokenStore);
-    }
-
-
-    @Primary
-    @Bean
-    public RemoteTokenServices tokenService() {
-        RemoteTokenServices tokenService = new RemoteTokenServices();
-        tokenService.setCheckTokenEndpointUrl(
-                "http://localhost:8080/oauth/check_token");
-        tokenService.setClientId(appProperties.getClientId());
-        tokenService.setClientSecret(appProperties.getClientSecret());
-        return tokenService;
     }
 
 }

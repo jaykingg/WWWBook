@@ -1,12 +1,10 @@
 package com.community.weddingbook.Author;
 
 import com.community.weddingbook.Common.AppProperties;
-import com.community.weddingbook.Configs.RestTemplateLoggingRequestInterceptor;
+import com.community.weddingbook.Configs.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,8 +20,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,6 +37,9 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
 
     @Autowired
     AppProperties appProperties;
+
+    @Autowired
+    AppConfig appConfig;
 
 
     /* Security */
@@ -64,60 +65,44 @@ public class AuthorServiceImpl implements AuthorService, UserDetailsService {
         return this.authorRepository.save(author);
     }
 
-    @Transactional
     @Override
     public ResponseEntity getTestID() {
 
-        RestTemplate restTemplate;
-        HttpHeaders headers;
-        Jackson2JsonParser parser2;
-
-        Author authorBuild = Author.builder()
-                .id("PO_TD_VAL")
+        Author testAuthor= Author.builder()
+                .id("PO_TEST_ID")
                 .name("PO")
-                .password("abc1234")
+                .password("1234")
                 .roles(Set.of(AuthorRole.USER))
                 .build();
 
-        Optional<Author> getAuthorOptional = this.authorRepository.findById(authorBuild.getId());
-        if(!getAuthorOptional.isEmpty()) {
-            throw new IllegalArgumentException("이미 테스트 계정이 생성되었습니다.");
-        }
 
-        Author saveAuthorResult = this.saveAuthor(authorBuild);
-        headers = new HttpHeaders();
+        this.saveAuthor(testAuthor);
+
+        HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(appProperties.getClientId(),appProperties.getClientSecret());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String,String> parameters = new LinkedMultiValueMap<>();
         parameters.add("grant_type","password");
-        parameters.add("username",saveAuthorResult.getId());
-        parameters.add("password","abc1234");
+        parameters.add("username", "PO_TEST_ID");
+        parameters.add("password", "1234");
         HttpEntity<MultiValueMap<String,String>> requestEntity = new HttpEntity<>(parameters,headers);
 
-        parser2 = new Jackson2JsonParser();
-        restTemplate = new RestTemplate();
+        Jackson2JsonParser parser2 = new Jackson2JsonParser();
+        RestTemplate restTemplate = new RestTemplate();
 
-        String response = restTemplate.postForObject(appProperties.getGetOauthURL(),requestEntity,String.class);
-        restTemplate.setInterceptors(Arrays.asList(new RestTemplateLoggingRequestInterceptor()));
+        String response = restTemplate.postForObject("http://localhost:8080/oauth/token",requestEntity,String.class);
+
+        System.out.println(response);
 
         String getaccess_Token = parser2.parseMap(response).get("access_token").toString();
-        String getrefrsh_Token = parser2.parseMap(response).get("refresh_token").toString();
 
-
-        /* Token 제대로 읽었는지 확인 */
-        if(getaccess_Token == null || getrefrsh_Token == null ) {
-            authorRepository.delete(saveAuthorResult);
-            return ResponseEntity.notFound().build();
-        }
-        saveAuthorResult.setServiceAccessToken(getaccess_Token);
-        saveAuthorResult.setServiceRefreshToken(getrefrsh_Token);
-
+        testAuthor.setServiceAccessToken(getaccess_Token);
 
         /* 마지막으로 최종 저장  */
-        this.authorRepository.save(saveAuthorResult);
+        Author resultAuthor = this.saveAuthor(testAuthor);
 
 
-        return ResponseEntity.ok(saveAuthorResult);
+        return ResponseEntity.ok(resultAuthor);
     }
 }

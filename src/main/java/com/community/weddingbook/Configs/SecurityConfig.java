@@ -30,28 +30,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    /* 토큰 정보 영속화 */
     @Bean
     public TokenStore tokenStore(@Qualifier("dataSource") DataSource dataSource) {
         return new JdbcTokenStore(dataSource);
     }
 
-    /* Authentication 매니저 */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-    /* AuthenticationManager를 재정의하기 위함. */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        //내가 구현한 accountService에 내가 지정한 encoder를 사용하겠다.
         auth.userDetailsService(authorServiceImpl)
                 .passwordEncoder(passwordEncoder);
     }
 
-    /* Docs 같은 정적 Resource는 무시함. */
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().mvcMatchers("/docs/index.html","/css/**", "/js/**", "/img/**","/vendor/**","/scss/**");
@@ -64,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .requestMatchers()
                     .antMatchers("/h2-console/")
+                .and()
+                .anonymous()
                 .and()
                 .headers().frameOptions().disable()
                 .and()
