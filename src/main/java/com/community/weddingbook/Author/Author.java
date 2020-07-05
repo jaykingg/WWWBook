@@ -34,6 +34,5 @@ public class Author {
     private Set<AuthorRole> roles;
 
     String ServiceAccessToken;
-    String ServiceRefreshToken;
 
 }
