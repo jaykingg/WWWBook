@@ -32,8 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@Import(RestDocsConfiguration.class)
 @Ignore
 public class BaseControllerTest {
 
