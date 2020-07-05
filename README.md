@@ -389,14 +389,21 @@ curl --location --request POST 'http://localhost:8080/api/board/makeCases' \
 40개의 테스트 게시물이 생성되었습니다.
 ````
 - - - -
+### 성능 측정 로그
+* Spring Boot AOP를 통하여, com.community.wedding.Board.BoardController에서 서비스되는 기능들에 대한 시간을 측정할 수 있다.
+* Log로 해당 메소드가 끝나면 출력되며, info, debug 타입으로 출력된다.   
+<img width="1253" alt="스크린샷 2020-07-05 오후 10 46 09" src="https://user-images.githubusercontent.com/20733918/86534247-fab90480-bf11-11ea-96cb-05b3cdcde45e.png">
+- - - -
 ### 테스트
 * 테스트는 TDD/BDD 방식으로 진행하였으며, Junit4를 이용한다.   
 * 아래 리스트를 BoardControllerTest에서 진행.
 1. 7개의 정상 Case 테스트.
-2. 게시글 저장할 때, 비밀번호 조건을 만족하지 못할 경우 테스트.
-3. 게시글 삭제할 때, 비밀번호가 다 경우 테스트.
-4. 게시글 수정할 때, 비밀번호가 다른 경우 테스트.
-
+2. 게시글 저장할 때, 제목 조건을 만족하지 못할 경우 테스트.
+2. 게시글 저장할 때, 내용 조건을 만족하지 못할 경우 테스트.
+4. 게시글 저장할 때, 비밀번호 조건을 만족하지 못할 경우 테스트.
+5. 게시글 삭제할 때, 비밀번호가 다 경우 테스트.
+6. 게시글 수정할 때, 비밀번호가 다른 경우 테스트.
+- - - - 
 ### Exception
 * 요구사항 이외에, 판단되는 예외들에 대한 Exception 처리.
 * 주로 사용된 Exceptions

@@ -57,6 +57,13 @@ public class BoardServiceImpl implements BoardService {
         Author getAuthor = this.authorRepository.findById(nowUserId)
                 .orElseThrow(() -> new UsernameNotFoundException("계정 정보가 잘못됨"));
 
+        if(boardDto.getTitle().length() > 20) {
+            return ResponseEntity.badRequest().build();
+        }
+        if(boardDto.getContent().length() > 20) {
+            return ResponseEntity.badRequest().build();
+        }
+
         /* Save */
         Board beforeBoard = this.appConfig.modelMapper().map(boardDto, Board.class);
         beforeBoard.setAuthor(getAuthor);
