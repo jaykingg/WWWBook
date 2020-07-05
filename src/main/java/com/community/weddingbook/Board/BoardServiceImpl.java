@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -36,6 +37,9 @@ public class BoardServiceImpl implements BoardService {
 
     @Autowired
     AppConfig appConfig;
+
+    @Autowired
+    BoardValidator boardValidator;
 
     @Autowired
     AuthorRepository authorRepository;
@@ -56,11 +60,7 @@ public class BoardServiceImpl implements BoardService {
 
         Author getAuthor = this.authorRepository.findById(nowUserId)
                 .orElseThrow(() -> new UsernameNotFoundException("계정 정보가 잘못됨"));
-
-        if(boardDto.getTitle().length() > 20) {
-            return ResponseEntity.badRequest().build();
-        }
-        if(boardDto.getContent().length() > 20) {
+        if(!boardValidator.validBoard(boardDto.getTitle(),boardDto.getContent(),boardDto.getPassword())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -174,6 +174,9 @@ public class BoardServiceImpl implements BoardService {
         }
         if(!getBoard.getPassword().equals(boardPutDto.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if(!boardValidator.validBoard(boardPutDto.getTitle(), boardPutDto.getContent(),boardPutDto.getPassword())) {
+            return ResponseEntity.badRequest().build();
         }
 
         getBoard.setTitle(boardPutDto.getTitle());

@@ -10,6 +10,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -20,7 +21,7 @@ public class BoardController {
     BoardServiceImpl boardServiceImpl;
 
     @PostMapping
-    public ResponseEntity saveBoard(@RequestBody BoardDto boardDto) throws Exception {
+    public ResponseEntity saveBoard(@RequestBody BoardDto boardDto, Errors errors) throws Exception {
         return boardServiceImpl.saveBoard(boardDto);
     }
 

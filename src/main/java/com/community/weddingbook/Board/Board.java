@@ -20,10 +20,10 @@ public class Board extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    @Size(min = 1, max = 20, message = "제목은 1~20자리 이내로 입력해주세요.")
+    @Size(min = 1, max = 20, message = "제목은 1~20자리 이내로 입력해주세요.") @NotNull
     String title;
 
-    @Size(max = 200, message = "내용은 200자리 이내로 입력해주세요.")
+    @Size(max = 200, message = "내용은 200자리 이내로 입력해주세요.") @NotNull
     String content;
 
     @ManyToOne(fetch = FetchType.EAGER) @NotNull
