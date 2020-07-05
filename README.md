@@ -405,6 +405,8 @@ curl --location --request POST 'http://localhost:8080/api/board/makeCases' \
 5. 게시글 저장할 때, 비밀번호 조건을 만족하지 못할 경우 테스트.
 6. 게시글 삭제할 때, 비밀번호가 다 경우 테스트.
 7. 게시글 수정할 때, 비밀번호가 다른 경우 테스트.
+<img width="333" alt="스크린샷 2020-07-06 오전 2 40 51" src="https://user-images.githubusercontent.com/20733918/86538655-2350f680-bf32-11ea-9c28-ebae4f3a524e.png">
+
 - - - - 
 ### Exception
 * 요구사항 이외에, 판단되는 예외들에 대한 Exception 처리.
