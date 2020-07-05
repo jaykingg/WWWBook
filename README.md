@@ -78,6 +78,7 @@
 - - - - 
 ### API 명세   
 > 각 명세에는 Reqeust / Response를 설명한다.
+> Response에는 동적으로 Application의 상태를 변경시킬 수 있도록 _Link를 통해 HATEOUAS를 만족한다.
 #### API 구조
 > Controller -> ServiceImpl <- Service interface
 * 다형성을 위해 Service interface에서 필요기능이 정의된다.
